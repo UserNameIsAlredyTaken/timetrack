@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#151517" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Время">
+  <title>Время</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <!-- Добавление -->
+    <section id="view-add" class="view active">
+      <div class="today-bar">
+        <button id="date-chip" class="date-chip" type="button">
+          <span id="date-label">Сегодня</span>
+          <input id="date-input" type="date" aria-label="Дата записи">
+        </button>
+        <span id="day-sum" class="muted"></span>
+      </div>
+      <div id="day-strip" class="strip"></div>
+
+      <div id="cat-grid" class="cat-grid"></div>
+
+      <div id="hours" class="hours">
+        <button type="button" data-h="1">1</button>
+        <button type="button" data-h="2">2</button>
+        <button type="button" data-h="3">3</button>
+        <button type="button" data-h="4">4</button>
+        <button type="button" data-h="5">5</button>
+        <button type="button" data-h="6">6</button>
+        <button type="button" data-h="7">7</button>
+        <button type="button" data-h="8">8</button>
+      </div>
+
+      <div class="precise">
+        <button id="precise-toggle" class="link" type="button">точнее</button>
+        <div id="precise-row" class="precise-row" hidden>
+          <input id="precise-h" type="number" inputmode="numeric" min="0" max="16" placeholder="ч" aria-label="Часы">
+          <span>ч</span>
+          <input id="precise-m" type="number" inputmode="numeric" min="0" max="59" step="5" placeholder="мин" aria-label="Минуты">
+          <span>мин</span>
+          <button id="precise-add" class="btn small" type="button">Добавить</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Записи -->
+    <section id="view-list" class="view">
+      <h1>Записи</h1>
+      <div id="list"></div>
+    </section>
+
+    <!-- Статистика -->
+    <section id="view-stats" class="view">
+      <div class="stats-head">
+        <h1>Статистика</h1>
+        <div class="seg" role="tablist">
+          <button type="button" data-mode="days" class="on">Дни</button>
+          <button type="button" data-mode="weeks">Недели</button>
+        </div>
+      </div>
+      <div id="stats"></div>
+    </section>
+
+    <!-- Категории -->
+    <section id="view-cats" class="view">
+      <h1>Категории</h1>
+      <div id="cat-list" class="cat-list"></div>
+      <button id="cat-new" class="btn ghost wide" type="button">+ Новая категория</button>
+      <p class="hint">Если за день набралось меньше 16 часов, остаток уходит в категорию по умолчанию.</p>
+
+      <div class="backup">
+        <span class="muted">Резервная копия</span>
+        <button id="export" class="link" type="button">Сохранить</button>
+        <label class="link">Загрузить<input id="import" type="file" accept="application/json" hidden></label>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs">
+    <button type="button" data-view="add" class="on">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Добавить</span>
+    </button>
+    <button type="button" data-view="list">
+      <svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span>Записи</span>
+    </button>
+    <button type="button" data-view="stats">
+      <svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>Статистика</span>
+    </button>
+    <button type="button" data-view="cats">
+      <svg viewBox="0 0 24 24"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/></svg><span>Категории</span>
+    </button>
+  </nav>
+
+  <div id="sheet-backdrop" class="backdrop" hidden></div>
+  <div id="sheet" class="sheet" hidden></div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
