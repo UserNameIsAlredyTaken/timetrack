@@ -1,6 +1,6 @@
 'use strict';
 
-const DAY_HOURS = 16;
+const DAY_HOURS = 24;
 const STORE_KEY = 'timetrack.v1';
 const DEFAULT_ID = 'default';
 const PALETTE = [
@@ -98,7 +98,7 @@ function firstDate() {
   return min;
 }
 
-// Часы по категориям за день; остаток до 16 ч уходит в категорию по умолчанию.
+// Часы по категориям за день; остаток до суток уходит в категорию по умолчанию.
 // Дни до первой записи и после сегодня не считаются.
 function dayTotals(date, first = firstDate()) {
   const t = {};
@@ -472,7 +472,7 @@ function openCatSheet(id) {
 
   openSheet(`
     <h2>${existing ? (isDefault ? 'Категория по умолчанию' : 'Категория') : 'Новая категория'}</h2>
-    ${isDefault ? '<p class="muted" style="margin-top:-8px;font-size:14px">Сюда уходит остаток дня до 16 часов.</p>' : ''}
+    ${isDefault ? '<p class="muted" style="margin-top:-8px;font-size:14px">Сюда уходит остаток суток до ' + DAY_HOURS + ' часов.</p>' : ''}
     <label class="f">Название</label>
     <input class="text" type="text" maxlength="40" data-t="name" value="${existing ? esc(existing.name) : ''}" placeholder="Например, Учёба">
     <label class="f">Цвет</label>
