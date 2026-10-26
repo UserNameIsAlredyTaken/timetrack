@@ -70,6 +70,7 @@ main {
   background: var(--soft); margin-bottom: 20px;
 }
 .strip i { display: block; height: 100%; }
+.strip i + i { box-shadow: inset 2px 0 var(--bg); }
 
 .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
 .cat-tile {

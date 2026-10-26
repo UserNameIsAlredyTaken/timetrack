@@ -156,8 +156,9 @@ function renderAdd() {
 
   const { logged } = dayTotals(entryDate);
   $('#day-sum').textContent = `${fmtH(logged)} из ${DAY_HOURS}`;
-  const dayParts = state.entries.filter(e => e.date === entryDate).reduce((t, e) => merge(t, { [e.catId]: e.hours }), {});
-  $('#day-strip').innerHTML = barHTML(sortedParts(dayParts).parts, Math.max(DAY_HOURS, logged));
+  // Каждая запись отдельным куском, в порядке добавления.
+  const dayEntries = state.entries.filter(e => e.date === entryDate).sort((a, b) => a.createdAt - b.createdAt);
+  $('#day-strip').innerHTML = barHTML(dayEntries.map(e => ({ cat: catById(e.catId), h: e.hours })), Math.max(DAY_HOURS, logged));
 
   const grid = $('#cat-grid');
   grid.innerHTML = state.categories.map(c =>
