@@ -113,11 +113,32 @@ main {
 
 .precise { margin-top: 18px; text-align: center; }
 .link { color: var(--muted); font-size: 14px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-.precise-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; color: var(--muted); }
+.precise-panel {
+  margin-top: 12px; padding: 14px; border-radius: var(--radius); background: var(--card);
+  display: grid; gap: 10px;
+}
+.precise-hours { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.precise-hours button, .half {
+  height: 44px; border-radius: 12px; background: var(--soft);
+  font-size: 18px; font-weight: 600; transition: transform .08s;
+}
+.half { font-size: 16px; }
+.precise-hours button:active, .half:active { transform: scale(.95); }
+.precise-hours button.sel, .half.sel { background: var(--c); color: #fff; }
+.precise-row { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--muted); }
 .precise-row input {
   width: 64px; height: 40px; text-align: center;
-  border: 1px solid var(--line); border-radius: 10px; background: var(--card);
+  border: 1px solid var(--line); border-radius: 10px; background: var(--bg);
+  -webkit-user-select: text; user-select: text;
 }
+
+#view-add { touch-action: pan-y; overflow-x: hidden; }
+.pager { will-change: transform; }
+.day-nav { display: flex; align-items: center; gap: 4px; }
+.day-arrow { width: 32px; height: 32px; border-radius: 50%; font-size: 22px; line-height: 1; color: var(--muted); }
+.day-arrow:disabled { opacity: .25; }
+.day-list { margin-top: 28px; }
+.day-empty { color: var(--muted); text-align: center; font-size: 14px; padding: 18px 0; }
 
 .btn {
   height: 48px; padding: 0 18px; border-radius: 12px;

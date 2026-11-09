@@ -170,7 +170,104 @@ function renderAdd() {
   hours.classList.toggle('off', !cat);
   hours.classList.toggle('on', !!cat);
   hours.style.setProperty('--c', cat ? cat.color : '');
+
+  $('#day-next').disabled = entryDate >= today();
+  syncPrecise();
+
+  // Записи выбранного дня — в том же порядке, что и на шкале.
+  $('#day-list-sum').textContent = dayEntries.length ? fmtH(logged) : '';
+  $('#day-list').innerHTML = dayEntries.length
+    ? `<div class="card">${dayEntries.map(e => {
+        const c = catById(e.catId);
+        return `<button type="button" class="row" data-id="${e.id}">
+          <span class="dot" style="--c:${c.color}"></span>
+          <span class="name">${esc(c.name)}</span>
+          <span class="val">${fmtH(e.hours)}</span></button>`;
+      }).join('')}</div>`
+    : `<div class="day-empty">За этот день записей нет</div>`;
 }
+
+$('#day-list').addEventListener('click', e => {
+  const b = e.target.closest('.row');
+  if (b) openEntrySheet(b.dataset.id);
+});
+
+// ---------- Переключение дней ----------
+
+function setEntryDate(d) {
+  entryDate = d > today() ? today() : d;
+  dateTouched = entryDate !== today();
+  renderAdd();
+}
+
+// Сдвиг на step дней с анимацией: старый день уезжает, новый приезжает с другой стороны.
+function stepDay(step) {
+  const next = addDays(entryDate, step);
+  const pager = $('#add-pager');
+  if (step > 0 && next > today()) { bounce(pager, -1); return; }
+  pager.style.transition = 'transform .14s ease-in, opacity .14s';
+  pager.style.transform = `translateX(${-step * 40}%)`;
+  pager.style.opacity = '0';
+  setTimeout(() => {
+    setEntryDate(next);
+    pager.style.transition = 'none';
+    pager.style.transform = `translateX(${step * 40}%)`;
+    pager.offsetWidth; // зафиксировать стартовую позицию
+    pager.style.transition = 'transform .2s ease-out, opacity .2s';
+    pager.style.transform = '';
+    pager.style.opacity = '';
+  }, 140);
+}
+
+function bounce(pager, dir) {
+  pager.style.transition = 'transform .12s ease-out';
+  pager.style.transform = `translateX(${dir * 24}px)`;
+  setTimeout(() => { pager.style.transition = 'transform .25s ease-out'; pager.style.transform = ''; }, 120);
+}
+
+$('#day-prev').addEventListener('click', () => stepDay(-1));
+$('#day-next').addEventListener('click', () => stepDay(1));
+
+// Свайп по экрану: вправо — предыдущий день, влево — следующий.
+(() => {
+  const view = $('#view-add');
+  const pager = $('#add-pager');
+  let x0 = 0, y0 = 0, dx = 0, mode = null;
+
+  view.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1 || e.target.closest('input')) { mode = 'skip'; return; }
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; mode = null;
+  }, { passive: true });
+
+  view.addEventListener('touchmove', e => {
+    if (mode === 'skip' || mode === 'v') return;
+    const mx = e.touches[0].clientX - x0, my = e.touches[0].clientY - y0;
+    if (!mode) {
+      if (Math.abs(mx) < 10 && Math.abs(my) < 10) return;
+      mode = Math.abs(mx) > Math.abs(my) ? 'h' : 'v';
+      if (mode === 'v') return;
+    }
+    dx = mx;
+    // В будущее не листаем — тянется с сопротивлением.
+    const atEnd = dx < 0 && entryDate >= today();
+    pager.style.transition = 'none';
+    pager.style.transform = `translateX(${atEnd ? dx / 4 : dx}px)`;
+  }, { passive: true });
+
+  const end = () => {
+    if (mode !== 'h') { mode = null; return; }
+    mode = null;
+    const threshold = Math.min(80, view.clientWidth * 0.2);
+    if (Math.abs(dx) > threshold && !(dx < 0 && entryDate >= today())) {
+      stepDay(dx > 0 ? -1 : 1);
+    } else {
+      pager.style.transition = 'transform .2s ease-out';
+      pager.style.transform = '';
+    }
+  };
+  view.addEventListener('touchend', end);
+  view.addEventListener('touchcancel', end);
+})();
 
 $('#cat-grid').addEventListener('click', e => {
   const b = e.target.closest('button');
@@ -187,25 +284,61 @@ $('#hours').addEventListener('click', e => {
 
 $('#date-input').addEventListener('change', e => {
   if (!e.target.value) return;
-  entryDate = e.target.value > today() ? today() : e.target.value;
-  dateTouched = entryDate !== today();
-  renderAdd();
+  setEntryDate(e.target.value);
 });
+
+// Точное время: часы одной кнопкой, полчаса одной кнопкой, а поля можно поправить руками.
+const PRECISE_HOURS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12];
+$('#precise-hours').innerHTML = PRECISE_HOURS.map(h => `<button type="button" data-ph="${h}">${h}</button>`).join('');
+
+function preciseValue() {
+  return (Number($('#precise-h').value) || 0) + (Number($('#precise-m').value) || 0) / 60;
+}
+
+function syncPrecise() {
+  const hv = $('#precise-h').value, mv = $('#precise-m').value;
+  document.querySelectorAll('#precise-hours button').forEach(b =>
+    b.classList.toggle('sel', hv !== '' && Number(hv) === Number(b.dataset.ph)));
+  $('#precise-half').classList.toggle('sel', Number(mv) === 30);
+  const h = preciseValue();
+  const add = $('#precise-add');
+  add.disabled = h <= 0;
+  add.textContent = h > 0 ? `Добавить ${fmtH(Math.min(h, 24))}` : 'Добавить';
+  const cat = selCat && catById(selCat);
+  $('#precise-panel').style.setProperty('--c', cat ? cat.color : 'var(--accent)');
+}
 
 $('#precise-toggle').addEventListener('click', () => {
-  const row = $('#precise-row');
-  row.hidden = !row.hidden;
-  if (!row.hidden) $('#precise-h').focus();
+  const panel = $('#precise-panel');
+  panel.hidden = !panel.hidden;
+  syncPrecise();
 });
 
+$('#precise-hours').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  $('#precise-h').value = b.dataset.ph;
+  syncPrecise();
+});
+
+$('#precise-half').addEventListener('click', () => {
+  const m = $('#precise-m');
+  m.value = Number(m.value) === 30 ? '' : 30;
+  if ($('#precise-h').value === '') $('#precise-h').value = 0;
+  syncPrecise();
+});
+
+$('#precise-h').addEventListener('input', syncPrecise);
+$('#precise-m').addEventListener('input', syncPrecise);
+
 $('#precise-add').addEventListener('click', () => {
-  const h = (Number($('#precise-h').value) || 0) + (Number($('#precise-m').value) || 0) / 60;
+  const h = preciseValue();
   if (!selCat) return toast('Сначала выберите категорию');
   if (h <= 0) return;
-  addEntry(Math.min(h, 24));
   $('#precise-h').value = '';
   $('#precise-m').value = '';
-  $('#precise-row').hidden = true;
+  $('#precise-panel').hidden = true;
+  addEntry(Math.min(h, 24));
 });
 
 function addEntry(hours) {

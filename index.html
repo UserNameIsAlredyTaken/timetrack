@@ -19,11 +19,16 @@
   <main>
     <!-- Добавление -->
     <section id="view-add" class="view active">
+      <div id="add-pager" class="pager">
       <div class="today-bar">
-        <button id="date-chip" class="date-chip" type="button">
-          <span id="date-label">Сегодня</span>
-          <input id="date-input" type="date" aria-label="Дата записи">
-        </button>
+        <div class="day-nav">
+          <button id="day-prev" class="day-arrow" type="button" aria-label="Предыдущий день">‹</button>
+          <button id="date-chip" class="date-chip" type="button">
+            <span id="date-label">Сегодня</span>
+            <input id="date-input" type="date" aria-label="Дата записи">
+          </button>
+          <button id="day-next" class="day-arrow" type="button" aria-label="Следующий день">›</button>
+        </div>
         <span id="day-sum" class="muted"></span>
       </div>
       <div id="day-strip" class="strip"></div>
@@ -43,13 +48,23 @@
 
       <div class="precise">
         <button id="precise-toggle" class="link" type="button">точнее</button>
-        <div id="precise-row" class="precise-row" hidden>
-          <input id="precise-h" type="number" inputmode="numeric" min="0" max="24" placeholder="ч" aria-label="Часы">
-          <span>ч</span>
-          <input id="precise-m" type="number" inputmode="numeric" min="0" max="59" step="5" placeholder="мин" aria-label="Минуты">
-          <span>мин</span>
-          <button id="precise-add" class="btn small" type="button">Добавить</button>
+        <div id="precise-panel" class="precise-panel" hidden>
+          <div id="precise-hours" class="precise-hours"></div>
+          <button id="precise-half" class="half" type="button">+30 мин</button>
+          <div class="precise-row">
+            <input id="precise-h" type="number" inputmode="numeric" min="0" max="24" placeholder="ч" aria-label="Часы">
+            <span>ч</span>
+            <input id="precise-m" type="number" inputmode="numeric" min="0" max="59" step="5" placeholder="мин" aria-label="Минуты">
+            <span>мин</span>
+          </div>
+          <button id="precise-add" class="btn wide" type="button" disabled>Добавить</button>
         </div>
+      </div>
+
+      <div class="day-list">
+        <div class="day-head"><span>Записи за день</span><span id="day-list-sum"></span></div>
+        <div id="day-list"></div>
+      </div>
       </div>
     </section>
 
