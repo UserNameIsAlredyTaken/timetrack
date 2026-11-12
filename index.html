@@ -35,30 +35,31 @@
 
       <div id="cat-grid" class="cat-grid"></div>
 
-      <div id="hours" class="hours">
-        <button type="button" data-h="1">1</button>
-        <button type="button" data-h="2">2</button>
-        <button type="button" data-h="3">3</button>
-        <button type="button" data-h="4">4</button>
-        <button type="button" data-h="5">5</button>
-        <button type="button" data-h="6">6</button>
-        <button type="button" data-h="7">7</button>
-        <button type="button" data-h="8">8</button>
+      <!-- Кнопки 1–8 и точное время делят одно место и сменяют друг друга с анимацией. -->
+      <div id="hours-box" class="hours-box">
+        <div id="hours" class="hours">
+          <button type="button" data-h="1">1</button>
+          <button type="button" data-h="2">2</button>
+          <button type="button" data-h="3">3</button>
+          <button type="button" data-h="4">4</button>
+          <button type="button" data-h="5">5</button>
+          <button type="button" data-h="6">6</button>
+          <button type="button" data-h="7">7</button>
+          <button type="button" data-h="8">8</button>
+        </div>
+        <div id="precise-panel" class="precise-panel" aria-hidden="true">
+          <div id="precise-hours" class="precise-hours"></div>
+          <div class="precise-row">
+            <input id="precise-h" type="number" inputmode="numeric" min="0" max="24" placeholder="ч" aria-label="Часы">
+            <input id="precise-m" type="number" inputmode="numeric" min="0" max="59" step="5" placeholder="мин" aria-label="Минуты">
+            <button id="precise-half" class="half" type="button">+30 мин</button>
+            <button id="precise-add" class="btn" type="button" disabled>Добавить</button>
+          </div>
+        </div>
       </div>
 
       <div class="precise">
         <button id="precise-toggle" class="link" type="button">точнее</button>
-        <div id="precise-panel" class="precise-panel" hidden>
-          <div id="precise-hours" class="precise-hours"></div>
-          <button id="precise-half" class="half" type="button">+30 мин</button>
-          <div class="precise-row">
-            <input id="precise-h" type="number" inputmode="numeric" min="0" max="24" placeholder="ч" aria-label="Часы">
-            <span>ч</span>
-            <input id="precise-m" type="number" inputmode="numeric" min="0" max="59" step="5" placeholder="мин" aria-label="Минуты">
-            <span>мин</span>
-          </div>
-          <button id="precise-add" class="btn wide" type="button" disabled>Добавить</button>
-        </div>
       </div>
 
       <div class="day-list">
