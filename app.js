@@ -173,6 +173,7 @@ function renderAdd() {
 
   $('#day-next').disabled = entryDate >= today();
   syncPrecise();
+  fitHoursBox();
 
   // Записи выбранного дня — в том же порядке, что и на шкале.
   $('#day-list-sum').textContent = dayEntries.length ? fmtH(logged) : '';
@@ -303,16 +304,33 @@ function syncPrecise() {
   const h = preciseValue();
   const add = $('#precise-add');
   add.disabled = h <= 0;
-  add.textContent = h > 0 ? `Добавить ${fmtH(Math.min(h, 24))}` : 'Добавить';
+  add.textContent = h > 0 ? `+ ${fmtH(Math.min(h, 24))}` : 'Добавить';
   const cat = selCat && catById(selCat);
   $('#precise-panel').style.setProperty('--c', cat ? cat.color : 'var(--accent)');
 }
 
-$('#precise-toggle').addEventListener('click', () => {
-  const panel = $('#precise-panel');
-  panel.hidden = !panel.hidden;
+// Высота коробки = высота видимой половины, чтобы переход между ними был плавным.
+function fitHoursBox() {
+  const box = $('#hours-box');
+  const shown = box.classList.contains('precise-open') ? $('#precise-panel') : $('#hours');
+  if (!shown.offsetHeight) return; // экран скрыт — посчитаем, когда покажется
+  box.style.height = `${shown.offsetHeight + 8}px`; // + padding коробки
+}
+
+function setPrecise(open) {
+  $('#hours-box').classList.toggle('precise-open', open);
+  $('#precise-panel').setAttribute('aria-hidden', String(!open));
+  $('#hours').setAttribute('aria-hidden', String(open));
+  $('#precise-toggle').textContent = open ? 'обычные 1–8' : 'точнее';
   syncPrecise();
+  fitHoursBox();
+}
+
+$('#precise-toggle').addEventListener('click', () => {
+  setPrecise(!$('#hours-box').classList.contains('precise-open'));
 });
+window.addEventListener('resize', fitHoursBox);
+fitHoursBox();
 
 $('#precise-hours').addEventListener('click', e => {
   const b = e.target.closest('button');
@@ -337,7 +355,7 @@ $('#precise-add').addEventListener('click', () => {
   if (h <= 0) return;
   $('#precise-h').value = '';
   $('#precise-m').value = '';
-  $('#precise-panel').hidden = true;
+  setPrecise(false);
   addEntry(Math.min(h, 24));
 });
 
